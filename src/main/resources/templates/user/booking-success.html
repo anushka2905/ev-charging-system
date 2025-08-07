@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Booking Success</title>
+</head>
+<body>
+    <h2>Booking Successful!</h2>
+    <p>Booking ID: <span th:text="${booking.id}"></span></p>
+    <p>Station: <span th:text="${booking.slot.station.name}"></span></p>
+    <p>Slot: <span th:text="${booking.slot.slotName}"></span></p>
+
+    <!-- Make Payment Button -->
+    <a th:href="@{/payment(bookingId=${booking.id})}" class="btn btn-success">Make Payment</a>
+</body>
+</html>

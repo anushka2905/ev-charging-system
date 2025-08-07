@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registration Success</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .success-container {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h2 {
+            color: green;
+        }
+        .login-link a {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .login-link a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="success-container">
+    <h2 th:text="${message}">Registered successfully!</h2>
+    <div class="login-link">
+        <a th:href="@{/login}">Go to Login</a>
+    </div>
+</div>
+</body>
+</html>

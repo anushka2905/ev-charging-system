@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Charging Slots</title>
+    <style>
+        table {
+            width: 70%;
+            margin: auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+        .booked {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h2 style="text-align:center;">Available Charging Slots for [[${stationName}]]</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Slot Name</th>
+        <th>Status</th>
+        <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="slot : ${slots}">
+        <td th:text="${slot.slotName}"></td>
+        <td>
+            <span th:if="${slot.available}" class="available">Available</span>
+            <span th:if="${!slot.available}" class="booked">Booked</span>
+        </td>
+        <td>
+            <a th:if="${slot.available}"
+               th:href="@{'/bookSlot/' + ${slot.id}}"
+               class="btn btn-success btn-sm">Book Now</a>
+            <span th:if="${!slot.available}">Not Available</span>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:if="${#lists.isEmpty(slots)}" style="text-align:center; margin-top:20px;">
+    No slots available for this station.
+</div>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Book Slot</title></head>
+<body>
+    <h2>Book Charging Slot</h2>
+    <form th:action="@{/user/book}" th:object="${booking}" method="post">
+        <input type="hidden" th:field="*{stationId}" th:value="${stationId}" />
+        <label>Date:</label>
+        <input type="date" th:field="*{date}" required />
+        <label>Time Slot:</label>
+        <input type="text" th:field="*{timeSlot}" placeholder="e.g. 2pm - 4pm" required />
+        <button type="submit">Book</button>
+    </form>
+</body>
+</html>

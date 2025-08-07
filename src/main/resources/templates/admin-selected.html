@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Selected Station</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: sans-serif;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .card {
+            background-color: #ffffff;
+            padding: 20px;
+            margin: auto;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .info {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .info p {
+            font-size: 16px;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>You've Selected:</h2>
+    <div class="info">
+        <p><strong>ID:</strong> <span th:text="${selectedStation.id}"></span></p>
+        <p><strong>Name:</strong> <span th:text="${selectedStation.name}"></span></p>
+        <p><strong>Address:</strong> <span th:text="${selectedStation.address}"></span></p>
+        <p><strong>City:</strong> <span th:text="${selectedStation.city}"></span></p>
+        <p><strong>Latitude:</strong> <span th:text="${selectedStation.latitude}"></span></p>
+        <p><strong>Longitude:</strong> <span th:text="${selectedStation.longitude}"></span></p>
+    </div>
+</div>
+
+</body>
+</html>

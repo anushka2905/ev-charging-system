@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - Booking Records</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+            color: #2e7d32;
+        }
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th {
+            background-color: #43a047;
+            color: white;
+        }
+        tr:hover {
+            background-color: #e8f5e9;
+        }
+        .nav-link {
+            text-align: center;
+            display: block;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #2e7d32;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>All Booking Records</h2>
+
+    <a th:href="@{/admin/dashboard}" class="nav-link">← Back to Dashboard</a>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Station</th>
+                <th>User</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Payment Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="booking : ${bookings}">
+                <td th:text="${booking.id}">1</td>
+                <td th:text="${booking.station.name}">Station Name</td>
+                <td th:text="${booking.user.username}">User Email</td>
+                <td th:text="${booking.date}">2025-08-01</td>
+                <td th:text="${booking.time}">12:00</td>
+                <td th:text="${booking.paymentStatus}">Paid</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

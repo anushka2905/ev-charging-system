@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All EV Charging Stations</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f9fc;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        .search-form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-form input, .search-form button {
+            padding: 10px;
+            margin: 5px;
+            font-size: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 10px #ccc;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #eef;
+        }
+
+        .select-btn {
+            background-color: #28a745;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .reset-btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<h2>All EV Charging Stations</h2>
+
+<div class="search-form">
+    <form th:action="@{/stations/list}" method="get">
+        <input type="text" name="name" placeholder="Search by name" th:value="${name}">
+        <input type="text" name="city" placeholder="Search by city" th:value="${city}">
+        <button type="submit">Search</button>
+        <a th:href="@{/stations/list}">
+            <button type="button" class="reset-btn">Reset</button>
+        </a>
+    </form>
+</div>
+
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>City</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="station : ${stations}">
+            <td th:text="${station.id}"></td>
+            <td th:text="${station.name}"></td>
+            <td th:text="${station.address}"></td>
+            <td th:text="${station.city}"></td>
+            <td th:text="${station.latitude}"></td>
+            <td th:text="${station.longitude}"></td>
+            <td>
+                <form th:action="@{/stations/select}" method="post">
+                    <input type="hidden" name="stationId" th:value="${station.id}" />
+                    <button type="submit" class="select-btn">Select</button>
+                </form>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<a href="/stations/map" class="button">View All Stations on Map</a>
+
+</body>
+</html>

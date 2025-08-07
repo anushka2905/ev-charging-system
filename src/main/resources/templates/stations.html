@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EV Charging Stations</title>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap"
+        async defer>
+    </script>
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h2>Nearby EV Charging Stations</h2>
+<div id="map"></div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var stations = /*[[${stations}]]*/ [];
+    console.log("Stations loaded: ", stations);
+
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            zoom: 12,
+            center: {lat: 23.2161, lng: 77.4152} // Default: Bhopal
+        });
+
+        stations.forEach(function(station) {
+            if (station.latitude !== 0 && station.longitude !== 0) {
+                var marker = new google.maps.Marker({
+                    position: {
+                        lat: station.latitude,
+                        lng: station.longitude
+                    },
+                    map: map,
+                    title: station.name
+                });
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: `<strong>${station.name}</strong><br>${station.address}, ${station.city}`
+                });
+
+                marker.addListener('click', function () {
+                    infowindow.open(map, marker);
+                });
+            }
+        });
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

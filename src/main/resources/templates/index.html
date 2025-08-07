@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EV Charging Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <style>
+        :root {
+            --bg-color: #e0f7fa;
+            --text-color: #000000;
+            --card-color: rgba(255, 255, 255, 0.95);
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --text-color: #ffffff;
+            --card-color: rgba(30, 30, 30, 0.95);
+        }
+
+        body {
+            margin: 0;
+            padding-top: 80px;
+            background-color: var(--bg-color);
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text-color);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--card-color);
+            padding: 15px 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 999;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #00796b;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-color);
+        }
+
+        .lottie-header {
+            width: 100%;
+            max-height: 200px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background: var(--card-color);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+            transition: transform 0.3s;
+        }
+
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        .icon {
+            font-size: 60px;
+            color: #2ecc71;
+            margin-bottom: 10px;
+        }
+
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .button {
+            text-decoration: none;
+            background: #4CAF50;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .button:hover {
+            background: #388e3c;
+            transform: scale(1.05);
+        }
+
+        .station-count {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #00695c;
+        }
+
+        .login-section {
+            margin-top: 30px;
+        }
+
+        .login-links a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+
+        .login-links a:hover {
+            text-decoration: underline;
+        }
+
+        .map-section {
+            margin: 40px auto;
+            width: 90%;
+            max-width: 800px;
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        iframe {
+            width: 100%;
+            height: 400px;
+            border: 0;
+        }
+
+        @media (max-width: 600px) {
+            .nav-links {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .container {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo">⚡ EV ChargeMap</div>
+    <div class="nav-links">
+        <a href="/">Home</a>
+        <a href="/stations/list">Stations</a>
+
+        <!-- If NOT Logged In -->
+        <span th:if="${session.user == null}">
+            <a href="/register">Sign Up</a>
+            <a href="/login">Login</a>
+        </span>
+
+        <!-- If Logged In -->
+        <span th:if="${session.user != null}">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/logout">Logout</a>
+        </span>
+
+        <!-- Dark Mode Toggle -->
+        <button class="toggle-btn" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Lottie Header -->
+<div class="lottie-header">
+    <lottie-player
+        src="https://lottie.host/2dcba17c-cdd2-4e39-bd88-72b3aab377e3/lLxk83EvFq.json"
+        background="transparent"
+        speed="1"
+        style="width: 300px; height: 200px;"
+        loop
+        autoplay>
+    </lottie-player>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+    <div class="icon">
+        <i class="fas fa-charging-station"></i>
+    </div>
+
+    <h1>EV Charging System</h1>
+    <p>Find and book electric vehicle charging stations with ease.</p>
+
+    <div class="button-group">
+        <a href="/register" class="button">Register / Sign Up</a>
+        <a href="/stations/list" class="button">View Charging Stations</a>
+    </div>
+
+    <div class="station-count">
+        Total Charging Stations: <span th:text="${stationCount}">24</span>
+    </div>
+
+    <div class="login-section">
+        <h3>Login as:</h3>
+        <div class="login-links">
+            <a href="/login">User</a>
+            <a href="/admin/login">Admin</a>
+        </div>
+    </div>
+</div>
+
+<!-- Google Map Section -->
+<div class="map-section">
+    <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14694.302986904118!2d77.3922416!3d23.2599332!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x397c43b055555555%3A0xa8e9024d07eeea91!2sBhopal%2C%20Madhya%20Pradesh!5e0!3m2!1sen!2sin!4v1690681439123!5m2!1sen!2sin"
+        allowfullscreen=""
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</div>
+
+<!-- Dark Mode JS -->
+<script>
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+    }
+</script>
+
+</body>
+</html>

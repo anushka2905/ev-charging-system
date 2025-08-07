@@ -1,0 +1,15 @@
+<!-- templates/user/payment.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payment</title>
+</head>
+<body>
+    <h2>Payment Page</h2>
+    <p th:text="'Booking ID: ' + ${booking.id}"></p>
+
+    <form th:action="@{'/bookings/user/process-payment/' + ${booking.id}}" method="post">
+        <button type="submit">Pay Now</button>
+    </form>
+</body>
+</html>

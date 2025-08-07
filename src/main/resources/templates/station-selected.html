@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Selected Charging Station</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        h2 {
+            color: #007bff;
+            text-align: center;
+        }
+
+        p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .back-btn {
+            display: block;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .back-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Station Selected Successfully</h2>
+    <p><strong>ID:</strong> <span th:text="${selectedStation.id}"></span></p>
+    <p><strong>Name:</strong> <span th:text="${selectedStation.name}"></span></p>
+    <p><strong>Address:</strong> <span th:text="${selectedStation.address}"></span></p>
+    <p><strong>City:</strong> <span th:text="${selectedStation.city}"></span></p>
+    <p><strong>Latitude:</strong> <span th:text="${selectedStation.latitude}"></span></p>
+    <p><strong>Longitude:</strong> <span th:text="${selectedStation.longitude}"></span></p>
+
+    <a th:href="@{/stations/list}" class="back-btn">Back to List</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Payment</title></head>
+<body>
+<h2>Make Payment</h2>
+
+<form th:action="@{/payments/submit}" method="post" th:object="${payment}">
+    Booking ID: <input type="number" th:field="*{booking.id}" /><br/>
+    Amount: <input type="number" step="0.01" th:field="*{amount}" /><br/>
+    Payment Method: <input type="text" th:field="*{paymentMethod}" placeholder="e.g. UPI/Card" /><br/>
+    <button type="submit">Pay</button>
+</form>
+
+</body>
+</html>

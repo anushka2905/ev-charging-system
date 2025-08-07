@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>EV Charging Stations Map</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- ✅ Leaflet CSS (fixed version without integrity) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align:center;">EV Charging Stations</h2>
+    <div id="map"></div>
+
+    <!-- ✅ Leaflet JS (fixed version without integrity) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+        let stations = JSON.parse(/*[[${stationsJson}]]*/ '[]');
+
+        console.log("Stations from backend:", stations);
+
+        var map = L.map('map').setView([23.2599, 77.4126], 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        stations.forEach(function(station) {
+            L.marker([station.latitude, station.longitude])
+                .addTo(map)
+                .bindPopup(`<b>${station.name}</b><br>${station.address}, ${station.city}`);
+        });
+    /*]]>*/
+    </script>
+</body>
+</html>

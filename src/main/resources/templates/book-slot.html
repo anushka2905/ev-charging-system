@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Book Charging Slot</title>
+</head>
+<body>
+    <h2>Book Charging Slot</h2>
+    <form th:action="@{/bookings/ui/submit}" th:object="${booking}" method="post">
+        <label>User:</label>
+        <select th:field="*{user.id}">
+            <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.name}"></option>
+        </select><br>
+
+        <label>Slot:</label>
+        <select th:field="*{slot.id}">
+            <option th:each="s : ${slots}" th:value="${s.id}" th:text="${s.slotNumber}"></option>
+        </select><br>
+
+        <label>Booking Time:</label>
+        <input type="datetime-local" th:field="*{bookingTime}" /><br>
+
+        <button type="submit">Book Slot</button>
+    </form>
+</body>
+</html>
