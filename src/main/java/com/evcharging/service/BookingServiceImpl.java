@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -22,7 +21,7 @@ public class BookingServiceImpl implements BookingService {
     private BookingRepository bookingRepository;
 
     @Autowired
-    private ChargingSlotRepository slotRepository;
+    private ChargingSlotRepository chargingSlotRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -47,16 +46,15 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.deleteById(id);
     }
 
-
     @Override
     public void markAsPaid(Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new RuntimeException("Booking not found"));
 
-        booking.setStatus(Booking.Status.PAID);
+        booking.setStatus(Status.PAID);
         bookingRepository.save(booking);
     }
-    
+
     @Override
     public List<Booking> getBookingsForUser(User user) {
         return bookingRepository.findByUser(user);
@@ -76,13 +74,9 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getBookingsByUsername(String username) {
         return bookingRepository.findByUserUsername(username);
     }
-    
-    @Autowired
-    private ChargingSlotRepository chargingSlotRepository;
-    
 
     @Override
-    public void bookSlot(Long slotId, String username) {
+    public Booking bookSlot(Long slotId, String username) {
         ChargingSlot slot = chargingSlotRepository.findById(slotId)
             .orElseThrow(() -> new RuntimeException("Slot not found"));
 
@@ -101,37 +95,110 @@ public class BookingServiceImpl implements BookingService {
 
         slot.setBooked(true);
         chargingSlotRepository.save(slot);
-        bookingRepository.save(booking);
+
+        return bookingRepository.save(booking);
     }
 
-
-
-    
     @Override
     public Booking getLatestBookingForUser(String username) {
-        User user = userRepository.findByEmail(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found: " + username));
+
         return bookingRepository.findTopByUserOrderByBookingTimeDesc(user)
-                .orElseThrow(() -> new RuntimeException("No recent booking found."));
+                .orElseThrow(() -> new RuntimeException("No recent booking found for user."));
     }
 
-	@Override
-	public Booking bookSlot(User user, ChargingSlot slot) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Booking bookSlot(Long slotId, Long userId) {
+        ChargingSlot slot = chargingSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Slot not found"));
 
-	@Override
-	public Booking bookSlot(Long slotId, Long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+        if (slot.isBooked()) {
+            throw new RuntimeException("Slot already booked");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        Booking booking = new Booking();
+        booking.setSlot(slot);
+        booking.setUser(user);
+        booking.setBookingTime(LocalDateTime.now());
+        booking.setStatus(Status.BOOKED);
+
+        slot.setBooked(true);
+        chargingSlotRepository.save(slot);
+
+        return bookingRepository.save(booking);
+    }
+
+    @Override
+    public Booking bookSlot(User user, ChargingSlot slot) {
+        if (slot.isBooked()) {
+            throw new RuntimeException("Slot already booked");
+        }
+
+        Booking booking = new Booking();
+        booking.setSlot(slot);
+        booking.setUser(user);
+        booking.setBookingTime(LocalDateTime.now());
+        booking.setStatus(Status.BOOKED);
+
+        slot.setBooked(true);
+        chargingSlotRepository.save(slot);
+
+        return bookingRepository.save(booking);
+    }
+
 
 	@Override
 	public void bookSlot(Long slotId, User user) {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public List<Booking> getBookingsByUserAndStation(Long userId, Long stationId) {
+	    return bookingRepository.findByUserIdAndSlot_ChargingStation_Id(userId, stationId);
+	}
+	
+	
+    public BookingServiceImpl(BookingRepository bookingRepository) {
+        this.bookingRepository = bookingRepository;
+    }
 
-    
-    
+	@Override
+	public List<Booking> findByUser(User user) {
+		// TODO Auto-generated method stub
+		return bookingRepository.findByUser(user);
+	}
+
+	@Override
+	public List<Booking> getBookingsByUser(User user) {
+		// TODO Auto-generated method stub
+		 return bookingRepository.findByUser(user);
+	}
+
+	public int countBookingsByStation(Long stationId) {
+        return bookingRepository.countBySlot_ChargingStation_Id(stationId);
+    }
+
+    public int countPaidBookingsByStation(Long stationId) {
+        return bookingRepository.countBySlot_ChargingStation_IdAndStatus(stationId, Status.PAID);
+    }
+
+    public void updateStatus(Long bookingId, Booking.Status status) {
+        Booking booking = bookingRepository.findById(bookingId).orElseThrow();
+        booking.setStatus(status);
+
+        // If cancelled → free up the slot
+        if (status == Booking.Status.CANCELLED) {
+            booking.getSlot().setAvailable(true);
+            chargingSlotRepository.save(booking.getSlot());
+        }
+
+        bookingRepository.save(booking);
+    }
+
+	
+	
 }

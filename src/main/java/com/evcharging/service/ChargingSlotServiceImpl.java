@@ -34,6 +34,18 @@ public class ChargingSlotServiceImpl implements ChargingSlotService {
     }
 
 	
+    @Override
+    public ChargingSlot bookSlot(Long slotId) {
+        ChargingSlot slot = chargingSlotRepository.findById(slotId)
+                .orElseThrow(() -> new RuntimeException("Slot not found"));
+
+        if (!slot.isAvailable()) {
+            throw new RuntimeException("Slot is already booked");
+        }
+
+        slot.setAvailable(false); // mark slot as booked
+        return chargingSlotRepository.save(slot);
+    }
 
 	@Autowired
     private ChargingSlotRepository slotRepo;

@@ -213,6 +213,13 @@ public class UserController {
 
         return "user/booking-success";  // In this template, add the "Make Payment" button
     }
+    @GetMapping("/users/bookings")
+    public String viewUserBookings(Authentication authentication, Model model) {
+        User user = userService.findByUsername(authentication.getName());
+        List<Booking> bookings = bookingService.getBookingsByUser(user.getId());
+        model.addAttribute("bookings", bookings);
+        return "user/bookings";  // Create templates/user/bookings.html
+    }
 
 
 }

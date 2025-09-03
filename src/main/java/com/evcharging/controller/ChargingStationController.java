@@ -1,6 +1,10 @@
 package com.evcharging.controller;
 
+import com.evcharging.dto.StationSummaryDTO;
+import com.evcharging.model.ChargingSlot;
 import com.evcharging.model.ChargingStation;
+import com.evcharging.service.BookingService;
+import com.evcharging.service.ChargingSlotService;
 import com.evcharging.service.ChargingStationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/stations")
@@ -117,7 +122,49 @@ public class ChargingStationController {
         model.addAttribute("stations", stations);
         return "station_map";
     }
+    @Autowired
+    private ChargingSlotService chargingSlotService;
 
+    @GetMapping("/details/{stationId}")
+    public String getStationDetails(@PathVariable Long stationId,
+                                    @RequestParam(value = "bookingSuccess", required = false) String bookingSuccess,
+                                    Model model) {
+        ChargingStation station = chargingStationService.getStationById(stationId);
+        List<ChargingSlot> slots = chargingSlotService.getSlotsByStationId(stationId);
+
+        model.addAttribute("station", station);
+        model.addAttribute("slots", slots);
+
+        if ("true".equals(bookingSuccess)) {
+            model.addAttribute("bookingSuccess", true);
+        }
+
+        return "station-details"; // station-details.html (your page)
+    }
+    @PostMapping("/book-slot")
+    public String bookSlot(@RequestParam Long slotId, @RequestParam Long stationId) {
+        chargingSlotService.bookSlot(slotId);
+        return "redirect:/stations/details/" + stationId + "?bookingSuccess=true";
+    }
+    
+    @Autowired
+    private BookingService bookingService;
+    
+    @GetMapping("/user/station-summary")
+    public String viewStationSummary(Model model) {
+        List<ChargingStation> stations = chargingStationService.getAllStations();
+
+        List<StationSummaryDTO> stationData = stations.stream()
+            .map(station -> new StationSummaryDTO(
+                    station.getName(),
+                    bookingService.countBookingsByStation(station.getId()),
+                    bookingService.countPaidBookingsByStation(station.getId())
+            ))
+            .collect(Collectors.toList());
+
+        model.addAttribute("stations", stationData);
+        return "user/station-summary";
+    }
 
 
 }

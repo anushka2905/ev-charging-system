@@ -3,6 +3,7 @@ package com.evcharging.controller;
 import com.evcharging.model.User;
 import com.evcharging.model.ChargingStation;
 import com.evcharging.model.Booking;
+import com.evcharging.model.Booking.Status;
 import com.evcharging.service.UserService;
 import com.evcharging.service.ChargingStationService;
 import com.evcharging.service.BookingService;
@@ -76,6 +77,23 @@ public class AdminController {
         stationService.deleteStationById(id);
         redirectAttributes.addFlashAttribute("success", "Station deleted successfully!");
         return "redirect:/admin/stations";
+    }
+    @GetMapping("/bookings/pay/{id}")
+    public String markPaid(@PathVariable Long id) {
+        bookingService.updateStatus(id, Status.PAID);
+        return "redirect:/admin/bookings";
+    }
+
+    @GetMapping("/bookings/cancel/{id}")
+    public String cancelBooking(@PathVariable Long id) {
+        bookingService.updateStatus(id, Status.CANCELLED);
+        return "redirect:/admin/bookings";
+    }
+
+    @GetMapping("/bookings/complete/{id}")
+    public String completeBooking(@PathVariable Long id) {
+        bookingService.updateStatus(id, Status.COMPLETED);
+        return "redirect:/admin/bookings";
     }
 
 

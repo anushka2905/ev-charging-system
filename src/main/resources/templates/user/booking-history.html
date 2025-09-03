@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Booking History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 60%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #fdfdfd;
+        }
+
+        tr:hover {
+            background-color: #e6f2ff;
+        }
+
+        .btn-back {
+            display: block;
+            width: 200px;
+            margin: 10px auto;
+            padding: 10px;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background-color: #007bff;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h2>Booking History</h2>
+
+<!-- Back to Dashboard Button -->
+<a th:href="@{/user/dashboard}" class="btn-back">Back to Dashboard</a>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Slot ID</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="booking, iterStat : ${bookings}">
+            <td th:text="${iterStat.index + 1}">1</td>
+            <td th:text="${booking.slot != null ? booking.slot.id : 'N/A'}">Slot</td>
+            <td th:text="${booking.status}">Status</td>
+        </tr>
+    </tbody>
+</table>
+</body>
+</html>

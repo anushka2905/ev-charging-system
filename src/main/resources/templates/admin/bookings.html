@@ -1,74 +1,107 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Admin - Booking Records</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <title>Admin Bookings</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
+            background-color: #f4f6f9;
+            margin: 0;
             padding: 20px;
         }
-        h2 {
+
+        h1 {
             text-align: center;
-            color: #2e7d32;
+            color: #333;
+            margin-bottom: 20px;
         }
+
         table {
             width: 90%;
-            margin: 20px auto;
+            margin: auto;
             border-collapse: collapse;
-            background-color: white;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
         }
-        th, td {
-            padding: 10px;
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        th {
-            background-color: #43a047;
+
+        thead {
+            background-color: #007BFF;
             color: white;
         }
-        tr:hover {
-            background-color: #e8f5e9;
-        }
-        .nav-link {
+
+        th, td {
+            padding: 12px 15px;
             text-align: center;
-            display: block;
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #2e7d32;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td {
+            color: #555;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 6px 12px;
+            margin: 2px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
             text-decoration: none;
+            color: white;
+        }
+
+        .btn-view {
+            background-color: #17a2b8;
+        }
+
+        .btn-complete {
+            background-color: #28a745;
+        }
+
+        .btn-cancel {
+            background-color: #dc3545;
+        }
+
+        .btn:hover {
+            opacity: 0.85;
         }
     </style>
 </head>
 <body>
 
-    <h2>All Booking Records</h2>
+<h1>All Bookings</h1>
 
-    <a th:href="@{/admin/dashboard}" class="nav-link">← Back to Dashboard</a>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Station</th>
-                <th>User</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Payment Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="booking : ${bookings}">
-                <td th:text="${booking.id}">1</td>
-                <td th:text="${booking.station.name}">Station Name</td>
-                <td th:text="${booking.user.username}">User Email</td>
-                <td th:text="${booking.date}">2025-08-01</td>
-                <td th:text="${booking.time}">12:00</td>
-                <td th:text="${booking.paymentStatus}">Paid</td>
-            </tr>
-        </tbody>
-    </table>
-
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="booking : ${bookings}">
+            <td th:text="${booking.id}">1</td>
+            <td th:text="${booking.user != null ? booking.user.username : 'N/A'}">Username</td>
+            <td th:text="${booking.status}">Status</td>
+            <td>
+                <a th:href="@{'/admin/bookings/view/' + ${booking.id}}" class="btn btn-view">View</a>
+                <a th:href="@{'/admin/bookings/complete/' + ${booking.id}}" class="btn btn-complete">Complete</a>
+                <a th:href="@{'/admin/bookings/cancel/' + ${booking.id}}" class="btn btn-cancel">Cancel</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<div style="text-align: center;">
+        <a th:href="@{/admin/dashboard}" class="nav-link">← Back to Dashboard</a>
+    </div>
 </body>
 </html>

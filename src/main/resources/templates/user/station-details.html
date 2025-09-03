@@ -76,11 +76,11 @@
 
 <h2>Station Details & Slots</h2>
 
-<!-- Flash Messages -->
+<!-- Flash messages -->
 <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
 <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
 
-<!-- Station Info -->
+<!-- Station info -->
 <div class="station-info">
     <h3 th:text="${station.name}">Station Name</h3>
     <p><strong>Location:</strong> <span th:text="${station.location}">Location</span></p>
@@ -88,7 +88,6 @@
     <p><strong>Longitude:</strong> <span th:text="${station.longitude}">77.123</span></p>
 </div>
 
-<!-- Available Slots -->
 <h3 style="text-align:center;">Available Slots</h3>
 <table class="slots-table">
     <thead>
@@ -102,30 +101,39 @@
     <tbody>
         <tr th:each="slot : ${slots}">
             <td th:text="${slot.id}">1</td>
-          <td th:text="${slot.slotName}"></td>
-            <td th:text="${slot.booked == true ? 'Booked' : 'Available'}"></td>
-		<td>
-		    <div th:if="${!slot.booked}">
-		        <form th:action="@{/users/book-slot}" method="post">
-		            <input type="hidden" name="slotId" th:value="${slot.id}" />
-		            <input type="hidden" name="stationId" th:value="${station.id}" />
-		            <button type="submit" class="book-btn">Book Slot</button>
-		        </form>
-		    </div>
-		    <div th:if="${slot.booked}">
-        		<span>N/A</span>
-    		</div>
-		</td>
+            <td th:text="${slot.slotName}">Time</td>
+            <td>
+                <span th:if="${bookedSlotIds != null and #lists.contains(bookedSlotIds, slot.id)}">Booked</span>
+                <span th:if="${bookedSlotIds == null or !(#lists.contains(bookedSlotIds, slot.id))}">Available</span>
+            </td>
+            <td>
+                <!-- Newly booked slot by this user -->
+                <div th:if="${bookingId != null and bookingSlotId != null and slot.id == bookingSlotId}">
+                    <div class="alert alert-success">Slot booked successfully!</div>
+                    <form th:action="@{'/bookings/user/payment/' + ${bookingId}}" method="get">
+                        <button type="submit" class="book-btn">Proceed to Payment</button>
+                    </form>
+                </div>
+
+                <!-- Already booked slot by others -->
+                <div th:if="${bookedSlotIds != null and #lists.contains(bookedSlotIds, slot.id) and (bookingSlotId == null or slot.id != bookingSlotId)}">
+                    <span>N/A</span>
+                </div>
+
+                <!-- Available slot -->
+                <div th:if="${bookedSlotIds == null or !(#lists.contains(bookedSlotIds, slot.id)) and (bookingSlotId == null or slot.id != bookingSlotId)}">
+                    <form th:action="@{/bookings/users/book-slot}" method="post">
+                        <input type="hidden" name="slotId" th:value="${slot.id}" />
+                        <input type="hidden" name="stationId" th:value="${station.id}" />
+                        <button type="submit" class="book-btn">Book Slot</button>
+                    </form>
+                </div>
+            </td>
         </tr>
     </tbody>
 </table>
-			<div th:if="${bookingSuccess}" class="alert alert-success" role="alert" style="width: 90%; margin: 20px auto;">
-		    Slot booked successfully!
-		    <a href="/payment" class="btn btn-primary btn-sm" style="float: right; margin-top: -5px;">Make Payment</a>
-		</div>
 
 <a class="back-link" th:href="@{/users/stations}">← Back to Station List</a>
-
 
 </body>
 </html>

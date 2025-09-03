@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Booking List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            padding: 20px 0;
+            color: #333;
+        }
+
+        table {
+            width: 80%;
+            margin: 0 auto 40px auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #e0f7fa;
+        }
+
+        a {
+            display: inline-block;
+            margin: 0 auto;
+            padding: 10px 20px;
+            text-decoration: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        a:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h2>My Bookings</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Station</th>
+                <th>Slot</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="booking : ${bookings}">
+                <td th:text="${booking.id}"></td>
+                <td th:text="${booking.slot != null and booking.slot.chargingStation != null} ? booking.slot.chargingStation.name : ''"></td>
+                <td th:text="${booking.slot != null} ? booking.slot.slotNumber : ''"></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="text-align:center;">
+        <a th:href="@{/user/dashboard}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

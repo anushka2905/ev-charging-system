@@ -1,0 +1,55 @@
+<!-- templates/user/payment-success.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Payment Successful</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f9;
+            padding: 20px;
+        }
+        .success-box {
+            max-width: 500px;
+            margin: 50px auto;
+            text-align: center;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #28a745;
+        }
+        p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+<div class="success-box">
+    <h2>✅ Payment Successful!</h2>
+    <p>Booking ID: <span th:text="${booking.id}">0</span></p>
+    <p>Station: <span th:text="${booking.slot != null && booking.slot.chargingStation != null ? booking.slot.chargingStation.name : 'N/A'}"></span></p>
+    <p>Slot: <span th:text="${booking.slot != null ? booking.slot.slotName : 'N/A'}"></span></p>
+    <p>Status: <span th:text="${booking.status}">N/A</span></p>
+    <a th:href="@{/bookings/user/history}" class="btn">Go to Booking History</a>
+
+</div>
+</body>
+</html>

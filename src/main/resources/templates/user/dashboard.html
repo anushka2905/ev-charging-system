@@ -46,7 +46,8 @@
 </head>
 <body>
 <div class="dashboard-container">
-    <h2>Welcome, <span th:text="${username}"></span>!</h2>
+    <h2>Welcome <span th:text="${username}"></span>!</h2>
+
 
     <div class="dashboard-grid">
         <a th:href="@{/users/stations}"> <!-- FIXED link -->
@@ -56,25 +57,39 @@
 		    </div>
 		</a>
 
-        <a th:href="@{/user/bookings}">
+        <a th:href="@{/bookings/user/history}">
             <div class="card">
                 <h3>My Bookings</h3>
                 <p>See your past and current bookings</p>
             </div>
         </a>
 
-        <a th:href="@{/user/slots}">
+        <a th:href="@{/users/stations}" >
             <div class="card">
                 <h3>Book a Slot</h3>
                 <p>Choose a charging slot and book now</p>
             </div>
         </a>
 
-        <a th:href="@{/user/payments}">
+        <a th:href="@{/bookings/user/payments}">
             <div class="card">
                 <h3>Payments</h3>
                 <p>Make or check payments for bookings</p>
             </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+    <a th:href="@{/}" >
+        <button style="
+            padding: 10px 20px; 
+            background-color: #2c3e50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer;
+            font-size: 16px;
+        ">
+            Return to Home
+        </button>
         </a>
     </div>
 </div>

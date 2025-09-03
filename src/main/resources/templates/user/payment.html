@@ -2,14 +2,94 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Payment</title>
+    <title>UPI Payment</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h2 {
+            color: #333;
+        }
+        .payment-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 2px 8px rgba(0,0,0,0.1);
+            max-width: 400px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .info-row {
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        label {
+            font-weight: bold;
+        }
+        .note {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-    <h2>Payment Page</h2>
-    <p th:text="'Booking ID: ' + ${booking.id}"></p>
 
+<div class="payment-container">
+    <h2>Payment for Booking #<span th:text="${booking.id}">0</span></h2>
+
+    <div class="info-row">
+        <strong>Station:</strong>
+        <span th:if="${booking.slot != null and booking.slot.chargingStation != null}"
+              th:text="${booking.slot.chargingStation.name}"></span>
+        <span th:unless="${booking.slot != null and booking.slot.chargingStation != null}">N/A</span>
+    </div>
+
+    <div class="info-row">
+        <strong>Slot:</strong>
+        <span th:if="${booking.slot != null}" th:text="${booking.slot.slotName}"></span>
+        <span th:unless="${booking.slot != null}">N/A</span>
+    </div>
+
+    <div class="info-row">
+        <strong>Status:</strong>
+        <span th:text="${booking.status}">N/A</span>
+    </div>
+
+    <!-- Mock UPI Payment Input -->
     <form th:action="@{'/bookings/user/process-payment/' + ${booking.id}}" method="post">
-        <button type="submit">Pay Now</button>
+        <div class="info-row">
+            <label for="upiId">Enter UPI ID:</label>
+            <input type="text" id="upiId" name="upiId" placeholder="example@upi" required />
+        </div>
+
+        <button type="submit" class="btn btn-success">Pay via UPI</button>
     </form>
+
+    <div class="note">
+        (This simulates a UPI payment. Clicking the button will mark the booking as PAID.)
+    </div>
+</div>
+
 </body>
 </html>

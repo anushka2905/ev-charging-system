@@ -10,5 +10,6 @@ public interface ChargingSlotService {
     ChargingSlot saveSlot(ChargingSlot slot);
     void deleteSlot(Long id);
 	List<ChargingSlot> getSlotsByStationId(Long stationId);
-	
+	ChargingSlot bookSlot(Long slotId);
+
 }
