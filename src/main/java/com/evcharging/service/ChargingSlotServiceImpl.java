@@ -1,26 +1,39 @@
 package com.evcharging.service;
 
+import com.evcharging.exception.ResourceNotFoundException;
+import com.evcharging.exception.SlotAlreadyBookedException;
 import com.evcharging.model.ChargingSlot;
 import com.evcharging.repository.ChargingSlotRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * ChargingSlotServiceImpl — Phase 0 refactored.
+ * Uses constructor injection, proper exceptions, SlotStatus enum.
+ */
 @Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class ChargingSlotServiceImpl implements ChargingSlotService {
 
-    @Autowired
-    private ChargingSlotRepository chargingSlotRepository;
+    private final ChargingSlotRepository chargingSlotRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChargingSlot> getAllSlots() {
         return chargingSlotRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ChargingSlot getSlotById(Long id) {
-        return chargingSlotRepository.findById(id).orElse(null);
+        return chargingSlotRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("ChargingSlot", id));
     }
 
     @Override
@@ -33,25 +46,19 @@ public class ChargingSlotServiceImpl implements ChargingSlotService {
         chargingSlotRepository.deleteById(id);
     }
 
-	
     @Override
     public ChargingSlot bookSlot(Long slotId) {
-        ChargingSlot slot = chargingSlotRepository.findById(slotId)
-                .orElseThrow(() -> new RuntimeException("Slot not found"));
-
+        ChargingSlot slot = getSlotById(slotId);
         if (!slot.isAvailable()) {
-            throw new RuntimeException("Slot is already booked");
+            throw new SlotAlreadyBookedException(slotId);
         }
-
-        slot.setAvailable(false); // mark slot as booked
+        slot.setStatus(ChargingSlot.SlotStatus.BOOKED);
         return chargingSlotRepository.save(slot);
     }
 
-	@Autowired
-    private ChargingSlotRepository slotRepo;
-
     @Override
+    @Transactional(readOnly = true)
     public List<ChargingSlot> getSlotsByStationId(Long stationId) {
-        return slotRepo.findByChargingStationId(stationId);
+        return chargingSlotRepository.findByChargingStationId(stationId);
     }
 }

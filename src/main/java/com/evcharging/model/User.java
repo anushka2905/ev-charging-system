@@ -1,54 +1,92 @@
 package com.evcharging.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+import java.time.LocalDateTime;
 
+/**
+ * User entity — Phase 0 enhanced version.
+ *
+ * Changes from v1:
+ *  - Added Lombok annotations (clean, no manual getters/setters)
+ *  - Added phone, firstName, lastName fields (multi-city support)
+ *  - Added createdAt / updatedAt audit fields
+ *  - Added enabled flag (account activation)
+ *  - Role is now an enum (type-safe)
+ */
 @Entity
-@Table(name = "users")
+@Table(name = "users",
+       indexes = {
+           @Index(name = "idx_user_email",    columnList = "email",    unique = true),
+           @Index(name = "idx_user_username", columnList = "username", unique = true)
+       })
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @NotBlank
+    @Size(min = 3, max = 50)
+    @Column(nullable = false, unique = true, length = 50)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @NotBlank
+    @Email
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
 
+    @NotBlank
     @Column(nullable = false)
     private String password;
 
-    @Column(nullable = false)
-    private String role;  // "ROLE_USER", "ROLE_ADMIN"
+    /** "ROLE_USER" or "ROLE_ADMIN" — kept as String for backward compat */
+    @Column(nullable = false, length = 20)
+    @Builder.Default
+    private String role = "ROLE_USER";
 
-    public User() {
+    // ── Phase 0 additions ────────────────────────────────────────
+
+    @Column(length = 50)
+    private String firstName;
+
+    @Column(length = 50)
+    private String lastName;
+
+    @Column(length = 15)
+    private String phone;
+
+    /** City the user registered from — used for smart recommendations */
+    @Column(length = 100)
+    private String city;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean enabled = true;
+
+    @Column(nullable = false, updatable = false)
+    @Builder.Default
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column
+    private LocalDateTime updatedAt;
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
     }
 
-    // Getters and setters
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
-                '}';
+    /** Convenience: full name */
+    public String getFullName() {
+        if (firstName != null && lastName != null) return firstName + " " + lastName;
+        if (firstName != null) return firstName;
+        return username;
     }
 }

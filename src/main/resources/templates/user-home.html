@@ -1,8 +1,200 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head><title>User Home</title></head>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>EV Charging — User Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <style>
+        body { background: #0f172a; color: #e2e8f0; }
+        .navbar-brand { color: #22d3ee !important; font-weight: 700; }
+        .hero { background: linear-gradient(135deg, #0369a1, #0c4a6e); padding: 3rem 0; }
+        .card-ai {
+            background: #1e293b; border: 1px solid #334155; border-radius: 16px;
+            transition: transform .2s, border-color .2s;
+        }
+        .card-ai:hover { transform: translateY(-4px); border-color: #22d3ee; }
+        .card-ai .card-body { padding: 1.5rem; }
+        .feature-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+        .nav-link { color: #94a3b8; }
+        .nav-link:hover, .nav-link.active { color: #22d3ee; }
+        .btn-ev { background: linear-gradient(135deg, #0369a1, #0ea5e9); border: none; color: #fff; }
+        .btn-ev:hover { background: linear-gradient(135deg, #0ea5e9, #22d3ee); color: #fff; }
+    </style>
+</head>
 <body>
-<h1>Welcome User</h1>
-<p>This is the user home page</p>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg" style="background:#1e293b; border-bottom:1px solid #334155;">
+    <div class="container">
+        <a class="navbar-brand" href="/">⚡ EV Charging AI</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+            <ul class="navbar-nav ms-auto gap-2">
+                <li class="nav-item"><a class="nav-link" href="/stations">Stations</a></li>
+                <li class="nav-item"><a class="nav-link" href="/station-map">Map</a></li>
+                <li class="nav-item"><a class="nav-link" href="/user/bookings">My Bookings</a></li>
+                <li class="nav-item">
+                    <span class="nav-link" sec:authentication="name"></span>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-sm btn-outline-danger ms-2" href="/logout">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="container text-center">
+        <h1 class="fw-bold text-white mb-2">
+            Welcome, <span style="color:#22d3ee;" sec:authentication="name">User</span>! ⚡
+        </h1>
+        <p class="text-white-50 mb-4">Your AI-powered EV Charging Dashboard</p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="/stations" class="btn btn-ev px-4 py-2">
+                <i class="bi bi-ev-station me-2"></i>Find Stations
+            </a>
+            <a href="/station-map" class="btn btn-outline-info px-4 py-2">
+                <i class="bi bi-map me-2"></i>View Map
+            </a>
+            <a href="/user/bookings" class="btn btn-outline-light px-4 py-2">
+                <i class="bi bi-calendar-check me-2"></i>My Bookings
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Grid -->
+<div class="container py-5">
+    <h4 class="text-center mb-4 text-white">
+        <i class="bi bi-robot me-2 text-info"></i>AI-Powered Features
+    </h4>
+    <div class="row g-4">
+
+        <div class="col-md-4">
+            <div class="card-ai h-100">
+                <div class="card-body">
+                    <div class="feature-icon mb-3" style="background:rgba(34,211,238,.15);">
+                        <i class="bi bi-chat-dots" style="color:#22d3ee;"></i>
+                    </div>
+                    <h6 class="fw-bold text-white">EV AI Assistant</h6>
+                    <p class="text-muted small">Ask anything about charging stations, book slots, get recommendations — all via natural language chat.</p>
+                    <button class="btn btn-sm btn-ev" onclick="evToggleChat()">
+                        <i class="bi bi-robot me-1"></i>Open Assistant
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-ai h-100">
+                <div class="card-body">
+                    <div class="feature-icon mb-3" style="background:rgba(34,197,94,.15);">
+                        <i class="bi bi-geo-alt" style="color:#22c55e;"></i>
+                    </div>
+                    <h6 class="fw-bold text-white">Smart Recommendations</h6>
+                    <p class="text-muted small">Get AI-powered station recommendations based on your location, preferred charger type, and availability.</p>
+                    <a href="/stations" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-star me-1"></i>View Recommendations
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-ai h-100">
+                <div class="card-body">
+                    <div class="feature-icon mb-3" style="background:rgba(168,85,247,.15);">
+                        <i class="bi bi-lightning" style="color:#a855f7;"></i>
+                    </div>
+                    <h6 class="fw-bold text-white">Natural Language Booking</h6>
+                    <p class="text-muted small">Say "Book a DC fast charger tonight at 7 PM" and our AI handles everything — station selection, availability check, and booking.</p>
+                    <button class="btn btn-sm btn-outline-warning" onclick="evNLBookPrompt()">
+                        <i class="bi bi-calendar-plus me-1"></i>Book with AI
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-ai h-100">
+                <div class="card-body">
+                    <div class="feature-icon mb-3" style="background:rgba(251,146,60,.15);">
+                        <i class="bi bi-book" style="color:#fb923c;"></i>
+                    </div>
+                    <h6 class="fw-bold text-white">EV Knowledge Base</h6>
+                    <p class="text-muted small">Get answers from our comprehensive EV knowledge base covering charging standards, government policies, battery tech, and more.</p>
+                    <button class="btn btn-sm btn-outline-warning" onclick="evAskKnowledge()">
+                        <i class="bi bi-question-circle me-1"></i>Ask Knowledge Base
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-ai h-100">
+                <div class="card-body">
+                    <div class="feature-icon mb-3" style="background:rgba(239,68,68,.15);">
+                        <i class="bi bi-map" style="color:#ef4444;"></i>
+                    </div>
+                    <h6 class="fw-bold text-white">Interactive Map</h6>
+                    <p class="text-muted small">View all charging stations on an interactive map with real-time availability, filters, and navigation support.</p>
+                    <a href="/station-map" class="btn btn-sm btn-outline-danger">
+                        <i class="bi bi-map me-1"></i>Open Map
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card-ai h-100">
+                <div class="card-body">
+                    <div class="feature-icon mb-3" style="background:rgba(16,185,129,.15);">
+                        <i class="bi bi-clock-history" style="color:#10b981;"></i>
+                    </div>
+                    <h6 class="fw-bold text-white">Booking History</h6>
+                    <p class="text-muted small">View all your past and upcoming bookings. Check payment status and cancel or modify reservations.</p>
+                    <a href="/user/bookings" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-calendar-check me-1"></i>View History
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- AI Assistant Chatbot Fragment -->
+<div th:replace="~{fragments/chatbot :: chatbot}"></div>
+
+<script>
+    function evNLBookPrompt() {
+        evToggleChat();
+        setTimeout(() => {
+            document.getElementById('ev-chat-input').value = 'Book a charging slot for me';
+            document.getElementById('ev-chat-input').focus();
+        }, 300);
+    }
+
+    function evAskKnowledge() {
+        evToggleChat();
+        setTimeout(() => {
+            document.getElementById('ev-chat-input').value = 'Explain the different EV charging types and which one is best for me';
+            document.getElementById('ev-chat-input').focus();
+        }, 300);
+    }
+</script>
 </body>
 </html>

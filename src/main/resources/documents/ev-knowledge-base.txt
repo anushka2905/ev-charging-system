@@ -1,0 +1,176 @@
+EV CHARGING STATION KNOWLEDGE BASE
+===================================
+
+SECTION 1: CHARGING STANDARDS AND TYPES
+-----------------------------------------
+
+CCS2 (Combined Charging System 2):
+CCS2 is the most widely adopted EV charging standard in India and Europe. It combines a Type-2 AC inlet with two additional DC pins, enabling both AC and DC charging from a single port. Vehicles: Tata Nexon EV, Tata Tigor EV, MG ZS EV, Hyundai Kona EV, Hyundai Ioniq 5, Kia EV6, BMW iX, Mercedes EQS.
+
+CHAdeMO:
+Japanese DC fast charging standard developed by Tokyo Electric Power Company. Primarily used by Nissan Leaf and Mitsubishi Outlander PHEV. Maximum power: 62.5 kW (CHAdeMO 1.0) to 400 kW (CHAdeMO 3.0 / ChaoJi).
+
+Type-2 (IEC 62196 Type 2):
+European standard for AC charging. Supports single-phase (3.7-7.4 kW) and three-phase (11-22 kW) charging. Most common for Level 2 public charging in Europe and India.
+
+Bharat AC-001:
+India-specific standard for 3.3 kW slow AC charging. Found in older Indian public charging stations. 15-amp plug compatible with Indian household outlets.
+
+Bharat DC-001:
+India-specific standard for 15 kW DC fast charging. Uses a 3-pin connector. Being phased out in favor of CCS2.
+
+GB/T:
+Chinese national standard used in vehicles sold in China. Supported in some BYD and other Chinese-manufactured EVs available in India.
+
+
+SECTION 2: CHARGING SPEED GUIDE
+---------------------------------
+
+Level 1 - Slow AC Charging (3.3 kW):
+- Uses standard household 15A outlet
+- Adds approximately 15-20 km of range per hour
+- Full charge time: 8-12 hours (typical EV battery 40-50 kWh)
+- Best for: Overnight home charging, workplace charging
+- Cost: Lowest electricity rate, home tariff applies
+- Infrastructure: No special installation required
+
+Level 2 - Fast AC Charging (7.2 kW - 22 kW):
+- Requires Type-2 AC wallbox or public charger
+- 7.2 kW adds ~35-40 km/hour; 22 kW adds ~100-110 km/hour
+- Full charge time: 2-6 hours
+- Best for: Public parking lots, malls, offices, hotels
+- Installation: Requires electrician, dedicated 32A circuit
+
+DC Fast Charging (50 kW):
+- Direct DC to battery, bypasses onboard charger
+- Charges from 20% to 80% in approximately 30-45 minutes
+- Best for: Highway stations, time-critical charging
+- Note: Frequent DC fast charging can slightly reduce battery longevity
+
+DC Ultra Fast Charging (100-350 kW):
+- High-power DC charging for premium EVs
+- Charges from 10% to 80% in 15-25 minutes
+- Vehicles: Hyundai Ioniq 5 (up to 220 kW), Kia EV6, Porsche Taycan
+- Infrastructure: Requires 3-phase commercial power supply
+
+
+SECTION 3: GOVERNMENT EV POLICY - INDIA
+-----------------------------------------
+
+FAME-II Scheme (Faster Adoption and Manufacturing of EVs):
+Budget: Rs 10,000 crore over 3 years (extended to 2024)
+Subsidy for 4-wheelers: Up to Rs 1.5 lakh (Rs 10,000/kWh for min 40 km range)
+Subsidy for 2-wheelers: Rs 10,000 per vehicle
+Subsidy for 3-wheelers: Rs 50,000 per vehicle
+Commercial EV buses: Up to Rs 20 lakh per bus
+
+Charging Infrastructure Mandate (BEE):
+- Public charging station every 3 km in cities with population > 4 lakh
+- Charging station every 25 km on highways
+- Multimodal transport hubs must have EV charging
+
+GST on EVs: 5% (reduced from 12% in 2019)
+GST on EV chargers: 5%
+
+State Subsidies (selected):
+- Maharashtra: Up to Rs 2.5 lakh for 4-wheelers
+- Delhi: Up to Rs 1.5 lakh + road tax exemption
+- Gujarat: Up to Rs 1.5 lakh
+- Karnataka: Road tax and registration fee waiver
+- Tamil Nadu: Road tax exemption + Rs 1 lakh subsidy
+
+Income Tax: Deduction up to Rs 1.5 lakh on EV loan interest (Section 80EEB)
+
+
+SECTION 4: BATTERY TECHNOLOGY
+-------------------------------
+
+Lithium-Ion (Li-Ion) NMC (Nickel Manganese Cobalt):
+- Energy density: 150-220 Wh/kg
+- Used in: Most modern EVs
+- Advantages: High energy density, good performance
+- Disadvantages: Thermal management critical, higher cost
+
+LFP (Lithium Iron Phosphate):
+- Energy density: 90-120 Wh/kg
+- Used in: Tata Nexon EV Max, BYD Atto 3, some Tesla Model 3
+- Advantages: Longer cycle life (3000+ cycles), better thermal safety, can charge to 100% daily
+- Disadvantages: Lower energy density, heavier
+
+Solid-State Batteries (emerging):
+- Energy density: 300-500 Wh/kg (projected)
+- Expected in production EVs: 2027-2030
+- Advantages: Higher safety, faster charging, longer range
+
+Battery Degradation:
+- Typical warranty: 8 years or 160,000 km
+- Expected degradation: 20-30% capacity loss after 1,00,000-1,50,000 km
+- Factors affecting degradation: Frequent DC fast charging, extreme temperatures, charging to 100% regularly
+
+Temperature Effects on Range:
+- Cold weather (below 0°C): 15-40% range reduction
+- Hot weather (above 40°C): 5-15% range reduction  
+- Optimal temperature: 15°C to 35°C
+- Solution: Battery preconditioning before charging
+
+
+SECTION 5: EV OWNERSHIP FAQ
+-----------------------------
+
+Q: How do I find a charging station?
+A: Use our EV Charging Station app to find nearby stations on the map. You can filter by charger type, availability, and distance. The AI assistant can also recommend the best station based on your location and vehicle.
+
+Q: Can I charge in the rain?
+A: Yes, absolutely. EV charging equipment is designed and certified to be waterproof. All public chargers meet IP54 or higher ingress protection ratings. Your vehicle's charging port is also waterproof.
+
+Q: Is it safe to leave my car charging overnight?
+A: Yes, modern EVs have sophisticated Battery Management Systems (BMS) that automatically stop charging when the battery reaches 100%. Most EVs also have scheduled charging features to optimize charging during off-peak hours.
+
+Q: What is regenerative braking?
+A: Regenerative braking recovers kinetic energy when you decelerate and converts it back to electricity, recharging the battery. This extends range by 10-25% and significantly reduces brake pad wear.
+
+Q: How do I maximize my EV's range?
+A: 1) Keep speed below 100 km/h on highways, 2) Use Eco/Range mode, 3) Precondition the cabin while still plugged in, 4) Avoid frequent DC fast charging, 5) Keep tire pressure optimal, 6) Plan routes using the charging network map.
+
+Q: What happens if my EV runs out of charge?
+A: Unlike ICE vehicles, running fully flat can cause more battery damage. Modern EVs have a buffer of 10-15% that counts as "0%" to protect the battery. You can call for a mobile charging service or get a flatbed tow to the nearest charging station.
+
+Q: How long do EV batteries last?
+A: Most EV batteries are warranted for 8 years or 1,60,000 km. Real-world data shows that well-maintained batteries retain 80-85% capacity after 8-10 years and 2,00,000+ km.
+
+
+SECTION 6: CHARGING BEST PRACTICES
+-------------------------------------
+
+Daily Charging:
+- Charge to 80% for daily use (extends battery longevity)
+- Only charge to 100% before long trips
+- For LFP batteries: Can charge to 100% daily without significant degradation
+
+Fast Charging Frequency:
+- Limit DC fast charging to 2-3 times per week maximum
+- Prefer Level 2 AC charging when time permits
+- Always have at least 20% charge before starting a DC fast charging session
+
+Optimal Charging Times:
+- Off-peak electricity hours (11 PM - 6 AM): 40-60% cheaper
+- Schedule charging using your vehicle's timer feature
+- Avoid charging during peak hours (6 PM - 10 PM) for grid sustainability
+
+Charging Etiquette:
+- Move your vehicle promptly after charging is complete
+- Do not occupy a charging spot without charging (ICE parking)
+- Report malfunctioning chargers to the operator
+- Charging spots are not parking spots
+
+Cold Weather:
+- Pre-heat the cabin while plugged in (not using battery)
+- Expect 15-30% reduced range in cold conditions
+- Keep the battery above 20% in extreme cold
+
+Hot Weather:
+- Park in shade when possible
+- Avoid charging immediately after a long high-speed drive
+- The BMS will manage battery temperature automatically
+
+End of Document

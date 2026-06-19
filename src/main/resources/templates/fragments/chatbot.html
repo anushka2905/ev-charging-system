@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<!--
+  AI Chatbot Widget — Thymeleaf Fragment
+  Include in any page with: th:replace="~{fragments/chatbot :: chatbot}"
+  
+  Features:
+  - Floating action button (bottom-right)
+  - Slide-up chat panel
+  - Multi-turn conversation with session memory
+  - Intent-aware responses (FIND_STATION, BOOK_SLOT, etc.)
+  - Natural language booking trigger
+-->
+<div th:fragment="chatbot">
+
+    <!-- Styles (scoped) -->
+    <style>
+        #ev-chat-fab {
+            position: fixed; bottom: 2rem; right: 2rem; z-index: 9999;
+            background: linear-gradient(135deg, #0ea5e9, #22d3ee);
+            width: 60px; height: 60px; border-radius: 50%; border: none;
+            font-size: 1.6rem; color: #fff;
+            box-shadow: 0 4px 20px rgba(14,165,233,.6);
+            cursor: pointer; transition: transform .2s, box-shadow .2s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        #ev-chat-fab:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(14,165,233,.8); }
+        #ev-chat-fab .badge-dot {
+            position: absolute; top: 4px; right: 4px;
+            width: 12px; height: 12px; background: #22c55e;
+            border-radius: 50%; border: 2px solid #fff;
+        }
+
+        #ev-chat-panel {
+            position: fixed; bottom: 5.5rem; right: 2rem; z-index: 9998;
+            width: 390px; max-height: 600px;
+            background: #1e293b; border: 1px solid #334155;
+            border-radius: 20px; box-shadow: 0 25px 80px rgba(0,0,0,.6);
+            display: none; flex-direction: column; overflow: hidden;
+            animation: slideUp .25s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        #ev-chat-header {
+            background: linear-gradient(135deg, #0369a1, #0ea5e9);
+            padding: 1rem 1.25rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-shrink: 0;
+        }
+        .ev-chat-avatar {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+        }
+        #ev-chat-messages {
+            flex: 1; overflow-y: auto; padding: 1rem;
+            background: #0f172a; min-height: 280px; max-height: 350px;
+        }
+        #ev-chat-messages::-webkit-scrollbar { width: 4px; }
+        #ev-chat-messages::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+        .ev-msg {
+            margin-bottom: .75rem; max-width: 85%; animation: fadeIn .2s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .ev-msg-user {
+            background: linear-gradient(135deg, #0369a1, #0ea5e9);
+            color: #fff; border-radius: 16px 16px 4px 16px;
+            padding: .65rem 1rem; margin-left: auto;
+            font-size: .875rem; line-height: 1.5;
+        }
+        .ev-msg-bot {
+            background: #1e293b; color: #e2e8f0;
+            border: 1px solid #334155; border-radius: 4px 16px 16px 16px;
+            padding: .65rem 1rem; font-size: .875rem; line-height: 1.6;
+            white-space: pre-wrap; word-break: break-word;
+        }
+        .ev-msg-typing { opacity: .7; }
+        .ev-typing-dots span {
+            display: inline-block; width: 6px; height: 6px;
+            border-radius: 50%; background: #94a3b8; margin: 0 2px;
+            animation: bounce 1.2s infinite;
+        }
+        .ev-typing-dots span:nth-child(2) { animation-delay: .2s; }
+        .ev-typing-dots span:nth-child(3) { animation-delay: .4s; }
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-6px); }
+        }
+
+        /* Quick suggestion chips */
+        #ev-quick-suggestions {
+            padding: .75rem 1rem; background: #0f172a;
+            border-top: 1px solid #1e293b; flex-shrink: 0; overflow-x: auto;
+            display: flex; gap: .5rem; flex-wrap: nowrap; white-space: nowrap;
+        }
+        .ev-chip {
+            background: #1e293b; border: 1px solid #334155; color: #94a3b8;
+            border-radius: 20px; padding: .3rem .9rem; font-size: .78rem;
+            cursor: pointer; transition: all .2s; flex-shrink: 0;
+        }
+        .ev-chip:hover { background: #0369a1; border-color: #0369a1; color: #fff; }
+
+        #ev-chat-input-area {
+            padding: .75rem 1rem; border-top: 1px solid #334155;
+            background: #1e293b; flex-shrink: 0;
+        }
+        #ev-chat-input {
+            background: #0f172a; border: 1px solid #334155; color: #e2e8f0;
+            border-radius: 10px; padding: .6rem 1rem; flex: 1;
+            font-size: .875rem; outline: none; transition: border-color .2s;
+        }
+        #ev-chat-input:focus { border-color: #0ea5e9; }
+        #ev-chat-send {
+            background: linear-gradient(135deg, #0369a1, #0ea5e9);
+            border: none; color: #fff; border-radius: 10px;
+            padding: .6rem .9rem; cursor: pointer; transition: opacity .2s;
+        }
+        #ev-chat-send:hover { opacity: .85; }
+        .ev-intent-badge {
+            display: inline-block; font-size: .7rem;
+            background: rgba(34,211,238,.15); color: #22d3ee;
+            border-radius: 4px; padding: 1px 6px; margin-bottom: 4px;
+        }
+    </style>
+
+    <!-- FAB Button -->
+    <button id="ev-chat-fab" title="EV AI Assistant" onclick="evToggleChat()">
+        ⚡
+        <span class="badge-dot"></span>
+    </button>
+
+    <!-- Chat Panel -->
+    <div id="ev-chat-panel">
+
+        <!-- Header -->
+        <div id="ev-chat-header">
+            <div class="d-flex align-items-center gap-3">
+                <div class="ev-chat-avatar">🤖</div>
+                <div>
+                    <div class="fw-semibold text-white">EV Assistant</div>
+                    <small style="color:rgba(255,255,255,.7);">AI-Powered • Gemini/GPT</small>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:none;"
+                        title="Clear conversation" onclick="evClearChat()">🗑</button>
+                <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#fff;border:none;"
+                        onclick="evToggleChat()">✕</button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="ev-chat-messages">
+            <div class="ev-msg">
+                <div class="ev-msg-bot">
+👋 Hi! I'm your <strong>EV Charging Assistant</strong>.<br/><br/>
+I can help you:<br/>
+🔍 Find charging stations<br/>
+📅 Check your bookings<br/>
+⚡ Learn about charger types<br/>
+💰 Understand pricing<br/>
+🤖 Book a slot using natural language<br/><br/>
+How can I assist you today?
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Suggestions -->
+        <div id="ev-quick-suggestions">
+            <span class="ev-chip" onclick="evSendSuggestion('Show available stations')">Available stations</span>
+            <span class="ev-chip" onclick="evSendSuggestion('What is DC fast charging?')">DC Fast charging?</span>
+            <span class="ev-chip" onclick="evSendSuggestion('Show my bookings')">My bookings</span>
+            <span class="ev-chip" onclick="evSendSuggestion('How do I book a slot?')">How to book?</span>
+            <span class="ev-chip" onclick="evSendSuggestion('What are the charging costs?')">Pricing</span>
+        </div>
+
+        <!-- Input Area -->
+        <div id="ev-chat-input-area">
+            <div class="d-flex gap-2">
+                <input id="ev-chat-input" type="text"
+                       placeholder="Ask anything or say 'book a fast charger'..."
+                       onkeydown="if(event.key==='Enter')evSendChat()"/>
+                <button id="ev-chat-send" onclick="evSendChat()">➤</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script>
+        (function() {
+            let evChatOpen = false;
+            let evSessionId = null;
+
+            window.evToggleChat = function() {
+                const panel = document.getElementById('ev-chat-panel');
+                evChatOpen = !evChatOpen;
+                panel.style.display = evChatOpen ? 'flex' : 'none';
+                if (evChatOpen) {
+                    document.getElementById('ev-chat-input').focus();
+                }
+            };
+
+            window.evClearChat = async function() {
+                if (evSessionId) {
+                    try {
+                        await fetch('/api/ai/chat/' + evSessionId, {method: 'DELETE'});
+                    } catch(e) {}
+                    evSessionId = null;
+                }
+                const msgs = document.getElementById('ev-chat-messages');
+                msgs.innerHTML = '<div class="ev-msg"><div class="ev-msg-bot">🔄 Conversation cleared. How can I help you?</div></div>';
+            };
+
+            window.evSendSuggestion = function(text) {
+                document.getElementById('ev-chat-input').value = text;
+                evSendChat();
+            };
+
+            window.evSendChat = async function() {
+                const input = document.getElementById('ev-chat-input');
+                const text = input.value.trim();
+                if (!text) return;
+                input.value = '';
+
+                evAppendMsg(text, 'user', null);
+                const typingEl = evAppendTyping();
+
+                try {
+                    const res = await fetch('/api/ai/chat', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({message: text, sessionId: evSessionId})
+                    });
+
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+
+                    const data = await res.json();
+                    typingEl.remove();
+                    evSessionId = data.sessionId;
+                    evAppendMsg(data.reply, 'bot', data.detectedIntent);
+
+                    // If intent is BOOK_SLOT, show NL booking suggestion
+                    if (data.detectedIntent === 'BOOK_SLOT') {
+                        evShowBookingPrompt(text);
+                    }
+
+                } catch(e) {
+                    typingEl.remove();
+                    evAppendMsg('⚠️ I\'m having trouble connecting to the AI service. Please try again or check your API configuration.', 'bot', null);
+                }
+            };
+
+            function evAppendMsg(text, type, intent) {
+                const msgs = document.getElementById('ev-chat-messages');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'ev-msg';
+
+                const bubble = document.createElement('div');
+                bubble.className = type === 'user' ? 'ev-msg-user' : 'ev-msg-bot';
+
+                if (type === 'bot' && intent && intent !== 'GENERAL_EV_INFO') {
+                    const badge = document.createElement('div');
+                    badge.className = 'ev-intent-badge';
+                    badge.textContent = intent.replace(/_/g, ' ');
+                    bubble.appendChild(badge);
+                    bubble.appendChild(document.createElement('br'));
+                }
+
+                bubble.appendChild(document.createTextNode(text));
+                wrapper.appendChild(bubble);
+                msgs.appendChild(wrapper);
+                msgs.scrollTop = msgs.scrollHeight;
+                return wrapper;
+            }
+
+            function evAppendTyping() {
+                const msgs = document.getElementById('ev-chat-messages');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'ev-msg';
+                wrapper.innerHTML = '<div class="ev-msg-bot ev-msg-typing"><div class="ev-typing-dots"><span></span><span></span><span></span></div></div>';
+                msgs.appendChild(wrapper);
+                msgs.scrollTop = msgs.scrollHeight;
+                return wrapper;
+            }
+
+            function evShowBookingPrompt(originalText) {
+                const msgs = document.getElementById('ev-chat-messages');
+                const div = document.createElement('div');
+                div.className = 'ev-msg';
+                div.innerHTML = `<div class="ev-msg-bot">
+                    💡 <strong>Quick Booking Available!</strong><br/>
+                    I can book a slot for you using natural language. Click below to proceed:
+                    <br/><br/>
+                    <button onclick="evNLBook('${originalText.replace(/'/g, "\\'")}')"
+                            style="background:#0369a1;border:none;color:#fff;border-radius:8px;padding:.5rem 1rem;cursor:pointer;font-size:.875rem;">
+                        ⚡ Book Now via AI
+                    </button>
+                </div>`;
+                msgs.appendChild(div);
+                msgs.scrollTop = msgs.scrollHeight;
+            }
+
+            window.evNLBook = async function(text) {
+                evAppendMsg('Booking: ' + text, 'user', null);
+                const typingEl = evAppendTyping();
+                try {
+                    const res = await fetch('/api/ai/book', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({message: text})
+                    });
+                    const data = await res.json();
+                    typingEl.remove();
+                    if (data.status === 'SUCCESS') {
+                        evAppendMsg(data.confirmationMessage, 'bot', 'BOOK_SLOT');
+                    } else {
+                        evAppendMsg('❌ ' + (data.errorMessage || 'Booking failed. Please try the manual booking form.'), 'bot', null);
+                    }
+                } catch(e) {
+                    typingEl.remove();
+                    evAppendMsg('⚠️ Booking service unavailable.', 'bot', null);
+                }
+            };
+        })();
+    </script>
+</div>
+</html>
