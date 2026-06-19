@@ -145,12 +145,12 @@ public class BookingController {
         // Get station summary
         List<ChargingStation> stations = chargingStationService.getAllStations();
         List<StationSummaryDTO> stationData = stations.stream()
-        	    .map(station -> new StationSummaryDTO(
-        	            station.getName(),
-        	            bookingService.countBookingsByStation(station.getId()),  // primitives are always valid
-        	            bookingService.countPaidBookingsByStation(station.getId())
-        	    ))
-        	    .collect(Collectors.toList());
+                .map(station -> StationSummaryDTO.builder()
+                        .name(station.getName())
+                        .totalSlots(bookingService.countBookingsByStation(station.getId()))
+                        .availableSlots(bookingService.countPaidBookingsByStation(station.getId()))
+                        .build())
+                .collect(Collectors.toList());
 
 
         return "user/booking-history";

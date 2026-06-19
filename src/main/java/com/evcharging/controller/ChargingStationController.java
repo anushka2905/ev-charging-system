@@ -155,11 +155,11 @@ public class ChargingStationController {
         List<ChargingStation> stations = chargingStationService.getAllStations();
 
         List<StationSummaryDTO> stationData = stations.stream()
-            .map(station -> new StationSummaryDTO(
-                    station.getName(),
-                    bookingService.countBookingsByStation(station.getId()),
-                    bookingService.countPaidBookingsByStation(station.getId())
-            ))
+            .map(station -> StationSummaryDTO.builder()
+                    .name(station.getName())
+                    .totalSlots(bookingService.countBookingsByStation(station.getId()))
+                    .availableSlots(bookingService.countPaidBookingsByStation(station.getId()))
+                    .build())
             .collect(Collectors.toList());
 
         model.addAttribute("stations", stationData);

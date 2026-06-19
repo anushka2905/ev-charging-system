@@ -16,29 +16,9 @@ import java.util.stream.Collectors;
 /**
  * RAGQueryService — Phase 5: Retrieval-Augmented Generation Query
  *
- * Architecture:
- * ─────────────
- * This service handles the RETRIEVAL + GENERATION part of RAG:
- *
- * 1. RETRIEVAL:
- *    - Converts the user's query to an embedding vector
- *    - Searches the VectorStore for top-K similar document chunks
- *    - Uses cosine similarity with configurable threshold (default 0.7)
- *
- * 2. AUGMENTATION:
- *    - Injects retrieved document chunks as context into the LLM prompt
- *    - Instructs the LLM to answer using ONLY the provided context
- *    - This prevents hallucination and grounds responses in actual documents
- *
- * 3. GENERATION:
- *    - LLM generates a response based on retrieved context
- *    - Response includes source attribution
- *
- * Why RAG instead of fine-tuning?
- *  - No retraining cost — add new documents without model updates
- *  - Source traceability — users know where the answer came from
- *  - Up-to-date information — just add new documents to the store
- *  - Production-ready — swap SimpleVectorStore for PgVector/Pinecone
+ * Updated for Spring AI 1.0.0-M6 API:
+ *  - SearchRequest uses SearchRequest.builder() instead of SearchRequest.query()
+ *  - Document.getText() replaces Document.getContent()
  */
 @Service
 @RequiredArgsConstructor
@@ -61,15 +41,11 @@ public class RAGQueryService {
 
     /**
      * Answer a question using RAG over the EV knowledge base.
-     *
-     * @param question User's question
-     * @return AI-generated answer grounded in retrieved documents
      */
     public RAGResponse query(String question) {
         log.info("RAG query: '{}'", question);
 
         try {
-            // Step 1: Retrieve relevant document chunks
             List<Document> relevantDocs = retrieveRelevantDocs(question);
 
             if (relevantDocs.isEmpty()) {
@@ -77,10 +53,7 @@ public class RAGQueryService {
                 return fallbackToLLM(question);
             }
 
-            // Step 2: Build augmented prompt
             String context = buildContext(relevantDocs);
-
-            // Step 3: Generate answer
             String answer = generateAnswer(question, context);
 
             return RAGResponse.builder()
@@ -96,13 +69,16 @@ public class RAGQueryService {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  STEP 1: Retrieval
+    //  STEP 1: Retrieval  (Spring AI M6 API)
     // ─────────────────────────────────────────────────────────────
 
     private List<Document> retrieveRelevantDocs(String question) {
-        SearchRequest searchRequest = SearchRequest.query(question)
-                .withTopK(topK)
-                .withSimilarityThreshold(similarityThreshold);
+        // Spring AI M6: use SearchRequest.builder() instead of SearchRequest.query()
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query(question)
+                .topK(topK)
+                .similarityThreshold(similarityThreshold)
+                .build();
 
         List<Document> docs = vectorStore.similaritySearch(searchRequest);
         log.debug("Retrieved {} relevant documents for query: '{}'", docs.size(), question);
@@ -110,7 +86,7 @@ public class RAGQueryService {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  STEP 2: Context Building
+    //  STEP 2: Context Building  (Spring AI M6: getText() not getContent())
     // ─────────────────────────────────────────────────────────────
 
     private String buildContext(List<Document> documents) {
@@ -120,7 +96,8 @@ public class RAGQueryService {
         for (int i = 0; i < documents.size(); i++) {
             Document doc = documents.get(i);
             ctx.append("--- Excerpt ").append(i + 1).append(" ---\n");
-            ctx.append(doc.getContent()).append("\n\n");
+            // Spring AI M6: getText() replaces getContent()
+            ctx.append(doc.getText()).append("\n\n");
         }
 
         return ctx.toString();
@@ -132,21 +109,20 @@ public class RAGQueryService {
 
     private String generateAnswer(String question, String context) {
         String ragPrompt = String.format("""
-            You are an expert EV (Electric Vehicle) assistant with deep knowledge about 
+            You are an expert EV (Electric Vehicle) assistant with deep knowledge about
             charging technology, policies, and best practices.
-            
+
             Use ONLY the information from the knowledge base below to answer the question.
             If the knowledge base doesn't contain enough information to answer, say so clearly
             and provide what you can from general EV knowledge.
-            
+
             %s
-            
+
             Question: %s
-            
-            Provide a clear, helpful, and accurate answer. If citing specific information from 
-            the knowledge base, mention it naturally (e.g., "According to the EV charging guide...").
+
+            Provide a clear, helpful, and accurate answer.
             """,
-            context, question
+                context, question
         );
 
         return chatClient.prompt()
