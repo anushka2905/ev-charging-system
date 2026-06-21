@@ -91,21 +91,25 @@ public class ChargingSlot {
     // ── Backward-compatibility helpers ───────────────────────────
 
     /** @deprecated use status == AVAILABLE */
+    @Deprecated(since = "2.0", forRemoval = false)
     public boolean isAvailable() {
         return this.status == SlotStatus.AVAILABLE;
     }
 
     /** @deprecated use status == BOOKED */
+    @Deprecated(since = "2.0", forRemoval = false)
     public boolean isBooked() {
         return this.status == SlotStatus.BOOKED || this.status == SlotStatus.IN_USE;
     }
 
     /** @deprecated use setStatus(SlotStatus.BOOKED) */
+    @Deprecated(since = "2.0", forRemoval = false)
     public void setBooked(boolean booked) {
         this.status = booked ? SlotStatus.BOOKED : SlotStatus.AVAILABLE;
     }
 
     /** @deprecated use setStatus(SlotStatus.AVAILABLE) */
+    @Deprecated(since = "2.0", forRemoval = false)
     public void setAvailable(boolean available) {
         if (available) this.status = SlotStatus.AVAILABLE;
     }

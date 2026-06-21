@@ -18,8 +18,16 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Ensures role is prefixed with ROLE_ as Spring expects
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
+        // user.getRole() already returns "ROLE_USER" or "ROLE_ADMIN" — do NOT add prefix again
+        String role = user.getRole();
+        if (role == null || role.isBlank()) {
+            role = "ROLE_USER";
+        }
+        // Normalise: if stored without prefix (legacy data), add it; otherwise use as-is
+        if (!role.startsWith("ROLE_")) {
+            role = "ROLE_" + role;
+        }
+        return Collections.singleton(new SimpleGrantedAuthority(role));
     }
 
     @Override

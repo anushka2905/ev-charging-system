@@ -8,7 +8,7 @@ import com.evcharging.service.UserService;
 import com.evcharging.service.ChargingStationService;
 import com.evcharging.service.BookingService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,16 +18,12 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
+@RequiredArgsConstructor
 public class AdminController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private ChargingStationService stationService;
-
-    @Autowired
-    private BookingService bookingService;
+    private final UserService userService;
+    private final ChargingStationService stationService;
+    private final BookingService bookingService;
 
     // Admin Home
     @GetMapping("/dashboard")
@@ -66,18 +62,22 @@ public class AdminController {
         return "redirect:/admin/users";
     }
 
-    // Delete Station
+    // Delete Station — merged the two conflicting methods into one with RedirectAttributes
     @GetMapping("/stations/delete/{id}")
-    public String deleteStation(@PathVariable Long id) {
-        stationService.deleteStationById(id);
-        return "redirect:/admin/stations";
-    }
-    @GetMapping("/station/delete/{id}")
     public String deleteStation(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         stationService.deleteStationById(id);
         redirectAttributes.addFlashAttribute("success", "Station deleted successfully!");
         return "redirect:/admin/stations";
     }
+
+    // Also support legacy path /admin/station/delete/{id}
+    @GetMapping("/station/delete/{id}")
+    public String deleteStationLegacy(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+        stationService.deleteStationById(id);
+        redirectAttributes.addFlashAttribute("success", "Station deleted successfully!");
+        return "redirect:/admin/stations";
+    }
+
     @GetMapping("/bookings/pay/{id}")
     public String markPaid(@PathVariable Long id) {
         bookingService.updateStatus(id, Status.PAID);
@@ -95,6 +95,4 @@ public class AdminController {
         bookingService.updateStatus(id, Status.COMPLETED);
         return "redirect:/admin/bookings";
     }
-
-
 }

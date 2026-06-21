@@ -7,7 +7,7 @@ import com.evcharging.service.BookingService;
 import com.evcharging.service.ChargingSlotService;
 import com.evcharging.service.ChargingStationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +19,13 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/stations")
+@RequiredArgsConstructor
 public class ChargingStationController {
 
-    @Autowired
-    private ChargingStationService chargingStationService;
+    private final ChargingStationService chargingStationService;
+    private final ChargingSlotService chargingSlotService;
+    private final BookingService bookingService;
+    private final ObjectMapper objectMapper;
 
     // Create a new station (REST API)
     @PostMapping
@@ -53,12 +56,11 @@ public class ChargingStationController {
         return "redirect:/stations/admin";
     }
 
-    // Show Google Map with stations
+    // Show Map with stations
     @GetMapping("/map")
     public String showMap(Model model) throws Exception {
         List<ChargingStation> stations = chargingStationService.getAllStations();
-        ObjectMapper mapper = new ObjectMapper();
-        String stationsJson = mapper.writeValueAsString(stations);
+        String stationsJson = objectMapper.writeValueAsString(stations);
         model.addAttribute("stationsJson", stationsJson);
         return "map"; // View: map.html
     }
@@ -91,7 +93,6 @@ public class ChargingStationController {
 
         List<ChargingStation> stations;
 
-        // If both filters are empty, return all stations
         if ((name == null || name.isEmpty()) && (city == null || city.isEmpty())) {
             stations = chargingStationService.getAllStations();
         } else {
@@ -107,23 +108,20 @@ public class ChargingStationController {
         return "station-list"; // View: station-list.html
     }
 
-
-    // Optional: used to forward selected station to booking page
+    // Used to forward selected station to booking page
     @PostMapping("/select")
     public String selectStation(@RequestParam("stationId") Long stationId, Model model) {
         ChargingStation selectedStation = chargingStationService.getStationById(stationId);
         model.addAttribute("selectedStation", selectedStation);
-        return "station-selected";  // View: station-selected.html (must exist)
+        return "station-selected"; // View: station-selected.html
     }
-    
+
     @GetMapping("/stations/map")
     public String showStationMap(Model model) {
         List<ChargingStation> stations = chargingStationService.getAllStations();
         model.addAttribute("stations", stations);
         return "station_map";
     }
-    @Autowired
-    private ChargingSlotService chargingSlotService;
 
     @GetMapping("/details/{stationId}")
     public String getStationDetails(@PathVariable Long stationId,
@@ -139,32 +137,28 @@ public class ChargingStationController {
             model.addAttribute("bookingSuccess", true);
         }
 
-        return "station-details"; // station-details.html (your page)
+        return "station-details"; // station-details.html
     }
+
     @PostMapping("/book-slot")
     public String bookSlot(@RequestParam Long slotId, @RequestParam Long stationId) {
         chargingSlotService.bookSlot(slotId);
         return "redirect:/stations/details/" + stationId + "?bookingSuccess=true";
     }
-    
-    @Autowired
-    private BookingService bookingService;
-    
+
     @GetMapping("/user/station-summary")
     public String viewStationSummary(Model model) {
         List<ChargingStation> stations = chargingStationService.getAllStations();
 
         List<StationSummaryDTO> stationData = stations.stream()
-            .map(station -> StationSummaryDTO.builder()
-                    .name(station.getName())
-                    .totalSlots(bookingService.countBookingsByStation(station.getId()))
-                    .availableSlots(bookingService.countPaidBookingsByStation(station.getId()))
-                    .build())
-            .collect(Collectors.toList());
+                .map(station -> StationSummaryDTO.builder()
+                        .name(station.getName())
+                        .totalSlots(bookingService.countBookingsByStation(station.getId()))
+                        .availableSlots(bookingService.countPaidBookingsByStation(station.getId()))
+                        .build())
+                .collect(Collectors.toList());
 
         model.addAttribute("stations", stationData);
         return "user/station-summary";
     }
-
-
 }

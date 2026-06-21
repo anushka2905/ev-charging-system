@@ -2,18 +2,17 @@ package com.evcharging.controller;
 
 import com.evcharging.model.User;
 import com.evcharging.repository.UserRepository;
-import com.evcharging.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
+@RequiredArgsConstructor
 public class LoginController {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @GetMapping("/login")
     public String loginPage() {
@@ -28,14 +27,15 @@ public class LoginController {
 
         if (user != null) {
             model.addAttribute("user", user);
-            if (user.getRole().equals("ADMIN")) {
+            String role = user.getRole();
+            // role is stored as "ROLE_ADMIN" or "ROLE_USER"
+            if ("ROLE_ADMIN".equals(role) || "ADMIN".equals(role)) {
                 return "redirect:/admin/dashboard";
-            } else if (user.getRole().equals("USER")) {
+            } else if ("ROLE_USER".equals(role) || "USER".equals(role)) {
                 return "redirect:/user/home";
             }
         }
 
-        
         return "redirect:/login?error"; // fallback
     }
 }

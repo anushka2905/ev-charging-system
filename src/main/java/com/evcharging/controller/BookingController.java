@@ -2,7 +2,6 @@ package com.evcharging.controller;
 
 import com.evcharging.dto.StationSummaryDTO;
 import com.evcharging.model.Booking;
-import java.util.HashMap;
 import com.evcharging.model.ChargingSlot;
 import com.evcharging.model.ChargingStation;
 import com.evcharging.model.User;
@@ -11,11 +10,8 @@ import com.evcharging.service.ChargingSlotService;
 import com.evcharging.service.ChargingStationService;
 import com.evcharging.service.UserService;
 
-import jakarta.persistence.ManyToOne;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -23,24 +19,17 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/bookings")
+@RequiredArgsConstructor
 public class BookingController {
 
-    @Autowired
-    private BookingService bookingService;
-
-    @Autowired
-    private ChargingStationService chargingStationService;
-
-    @Autowired
-    private ChargingSlotService chargingSlotService;
-
-    @Autowired
-    private UserService userService;
+    private final BookingService bookingService;
+    private final ChargingStationService chargingStationService;
+    private final ChargingSlotService chargingSlotService;
+    private final UserService userService;
 
     // Show station details and slots
     @GetMapping("/stations/{stationId}")
@@ -55,7 +44,7 @@ public class BookingController {
         model.addAttribute("station", station);
         model.addAttribute("slots", slots);
 
-        if(authentication != null) {
+        if (authentication != null) {
             User user = userService.findByUsername(authentication.getName());
             List<Booking> userBookings = bookingService.getBookingsByUserAndStation(user.getId(), stationId);
             List<Long> bookedSlotIds = userBookings.stream()
@@ -64,13 +53,8 @@ public class BookingController {
             model.addAttribute("bookedSlotIds", bookedSlotIds);
         }
 
-        // Flash attributes are already in the Model automatically
-        // So you can safely read them in Thymeleaf if needed:
-        // ${bookingSuccess}, ${bookingId}, ${bookingSlotId}, ${success}, ${error}
-
         return "user/station-details";
     }
-
 
     @PostMapping("/users/book-slot")
     public String bookSlot(@RequestParam Long slotId,
@@ -78,10 +62,7 @@ public class BookingController {
                            Authentication authentication,
                            RedirectAttributes redirectAttributes) {
         try {
-            // Use username instead of email
             String username = authentication.getName();
-            User user = userService.findByUsername(username);
-
             Booking booking = bookingService.bookSlot(slotId, username);
 
             redirectAttributes.addFlashAttribute("bookingSuccess", true);
@@ -95,19 +76,13 @@ public class BookingController {
         return "redirect:/bookings/stations/" + stationId;
     }
 
-
-
     // Show payment page
     @GetMapping("/user/payment/{bookingId}")
     public String showPaymentPage(@PathVariable Long bookingId, Model model) {
         Booking booking = bookingService.getBookingById(bookingId);
-        if (booking == null) {
-            throw new RuntimeException("Booking not found for ID: " + bookingId);
-        }
         model.addAttribute("booking", booking);
         return "user/payment";
     }
-
 
     @PostMapping("/user/process-payment/{id}")
     public String processPayment(@PathVariable("id") Long bookingId, Model model) {
@@ -116,33 +91,25 @@ public class BookingController {
             booking.setStatus(Booking.Status.PAID);
             bookingService.createBooking(booking); // save updated status
             model.addAttribute("booking", booking);
-            return "redirect:/bookings/user/payment-success/" + bookingId; // Pass ID
+            return "redirect:/bookings/user/payment-success/" + bookingId;
         }
-        return "redirect:/bookings/user"; // fallback if booking not found
+        return "redirect:/bookings/user";
     }
 
-    
     @GetMapping("/user/payment-success/{id}")
     public String paymentSuccess(@PathVariable Long id, Model model) {
         Booking booking = bookingService.getBookingById(id);
-        if (booking == null) {
-            return "redirect:/user/dashboard";
-        }
         model.addAttribute("booking", booking);
-        return "user/payment-success"; // corresponds to payment-success.html
+        return "user/payment-success";
     }
-    
-    
 
     @GetMapping("/user/history")
     public String viewBookingHistory(Authentication authentication, Model model) {
-        // Get user bookings
         String username = authentication.getName();
         User user = userService.findByUsername(username);
         List<Booking> bookings = bookingService.getBookingsByUser(user);
         model.addAttribute("bookings", bookings);
 
-        // Get station summary
         List<ChargingStation> stations = chargingStationService.getAllStations();
         List<StationSummaryDTO> stationData = stations.stream()
                 .map(station -> StationSummaryDTO.builder()
@@ -152,9 +119,10 @@ public class BookingController {
                         .build())
                 .collect(Collectors.toList());
 
-
+        model.addAttribute("stationData", stationData);
         return "user/booking-history";
     }
+
     @GetMapping("/user/payments")
     public String viewUserPayments(Authentication authentication, Model model) {
         String username = authentication.getName();
@@ -166,12 +134,13 @@ public class BookingController {
                 .toList();
 
         model.addAttribute("bookings", paidBookings);
-        return "user/payment-history"; // new template
+        return "user/payment-history";
     }
+
     @GetMapping("/user/dashboard")
     public String userDashboard(Model model, Principal principal) {
         if (principal == null) {
-            return "redirect:/login"; // user not logged in
+            return "redirect:/login";
         }
 
         String username = principal.getName();
@@ -179,13 +148,7 @@ public class BookingController {
             return "redirect:/login";
         }
 
-        model.addAttribute("username", username); // pass username directly
+        model.addAttribute("username", username);
         return "user/dashboard";
     }
-
-
-
-
-	}
-
-
+}

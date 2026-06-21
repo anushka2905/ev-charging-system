@@ -2,7 +2,7 @@ package com.evcharging.controller;
 
 import com.evcharging.model.Payment;
 import com.evcharging.service.PaymentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -10,15 +10,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
-@Controller   // <-- Change here
+@Controller
 @RequestMapping("/payments")
+@RequiredArgsConstructor
 public class PaymentController {
 
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
 
     @PostMapping
-    @ResponseBody  // for JSON response only
+    @ResponseBody
     public Payment processPayment(@RequestBody Payment payment) {
         return paymentService.processPayment(payment);
     }
@@ -47,6 +47,6 @@ public class PaymentController {
     @GetMapping("/payment")
     public String paymentPage(@RequestParam(required = false) Long bookingId, Model model) {
         model.addAttribute("bookingId", bookingId);
-        return "payment"; // Looks for payment.html
+        return "payment";
     }
 }

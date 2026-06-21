@@ -7,7 +7,7 @@ import com.evcharging.service.BookingService;
 import com.evcharging.service.ChargingSlotService;
 import com.evcharging.service.UserService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -18,16 +18,12 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/booking")
+@RequiredArgsConstructor
 public class BookingUIController {
 
-    @Autowired
-    private ChargingSlotService chargingSlotService;
-
-    @Autowired
-    private BookingService bookingService;
-
-    @Autowired
-    private UserService userService;
+    private final ChargingSlotService chargingSlotService;
+    private final BookingService bookingService;
+    private final UserService userService;
 
     // Step 1: Show all available slots
     @GetMapping("/slots")
@@ -41,8 +37,10 @@ public class BookingUIController {
     @PostMapping("/book/{slotId}")
     public String bookSlot(@PathVariable Long slotId, Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName(); // Assuming username is email
-        User user = userService.getUserByEmail(username);
+        String username = auth.getName();
+
+        // auth.getName() returns the username (not email) — look up by username
+        User user = userService.findByUsername(username);
 
         ChargingSlot slot = chargingSlotService.getSlotById(slotId);
 
@@ -76,7 +74,7 @@ public class BookingUIController {
     public String viewBookingHistory(Model model) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
-        User user = userService.getUserByEmail(username);
+        User user = userService.findByUsername(username);
 
         List<Booking> bookings = bookingService.getBookingsForUser(user);
         model.addAttribute("bookings", bookings);
