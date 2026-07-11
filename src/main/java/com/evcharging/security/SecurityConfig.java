@@ -64,7 +64,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 // ── Public access ──────────────────────────────
                 .requestMatchers(
-                    "/", "/register", "/login",
+                    "/", "/register", "/users/register", "/login",
                     "/stations/list",
                     "/css/**", "/js/**", "/images/**",
                     "/webjars/**", "/actuator/health"
