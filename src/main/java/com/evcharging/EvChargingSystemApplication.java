@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * AI-Powered EV Charging Station Management System
@@ -21,6 +22,7 @@ import org.springframework.context.annotation.Bean;
  * Phase 6: Predictive Analytics with AI Insights
  */
 @SpringBootApplication
+@EnableAsync
 public class EvChargingSystemApplication {
 
     public static void main(String[] args) {

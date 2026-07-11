@@ -19,7 +19,7 @@
     <description>Enterprise-grade AI-Powered EV Charging Station Management System using Spring Boot + Spring AI</description>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>17</java.version>
         <spring-ai.version>1.0.0-M6</spring-ai.version>
         <lombok.version>1.18.32</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
@@ -95,12 +95,6 @@
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
-        </dependency>
-
-        <!-- ── Spring AI – Vector Store (Simple / in-memory) ───── -->
-        <dependency>
-            <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-transformers-spring-boot-starter</artifactId>
         </dependency>
 
         <!-- ── Spring AI – PDF reader (for RAG documents) ──────── -->

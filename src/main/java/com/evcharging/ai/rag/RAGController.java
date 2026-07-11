@@ -52,11 +52,13 @@ public class RAGController {
     /** Check knowledge base status */
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> status() {
+        String failure = ingestionService.getIngestionFailure();
         return ResponseEntity.ok(Map.of(
             "knowledgeBaseReady", ingestionService.isIngestionComplete(),
             "message", ingestionService.isIngestionComplete()
                     ? "EV knowledge base is loaded and ready"
-                    : "Knowledge base is still loading..."
+                    : failure == null ? "Knowledge base is still loading..."
+                    : "Knowledge base is unavailable; see application logs for the RAG initialization failure"
         ));
     }
 }

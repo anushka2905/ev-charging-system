@@ -1,16 +1,19 @@
 package com.evcharging.ai.rag;
 
 import com.evcharging.exception.AIServiceException;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.tika.TikaDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -58,7 +61,7 @@ import java.util.List;
 @Slf4j
 public class RAGDocumentIngestionService {
 
-    private final VectorStore vectorStore;
+    private final ObjectProvider<VectorStore> vectorStoreProvider;
 
     @Value("${ev.rag.chunk-size:800}")
     private int chunkSize;
@@ -66,13 +69,15 @@ public class RAGDocumentIngestionService {
     @Value("${ev.rag.chunk-overlap:100}")
     private int chunkOverlap;
 
-    private boolean ingestionComplete = false;
+    private volatile boolean ingestionComplete = false;
+    private volatile String ingestionFailure;
 
     /**
      * Automatically ingest documents on application startup.
      * Uses @PostConstruct to run after Spring context is ready.
      */
-    @PostConstruct
+    @Async("ragTaskExecutor")
+    @EventListener(ApplicationReadyEvent.class)
     public void ingestDocuments() {
         log.info("=== RAG Phase 5: Starting document ingestion ===");
 
@@ -128,7 +133,7 @@ public class RAGDocumentIngestionService {
                     });
 
             if (!allDocuments.isEmpty()) {
-                vectorStore.add(allDocuments);
+                vectorStore().add(allDocuments);
                 log.info("=== RAG ingestion complete: {} chunks added to vector store ===", allDocuments.size());
                 ingestionComplete = true;
             } else {
@@ -137,8 +142,8 @@ public class RAGDocumentIngestionService {
             }
 
         } catch (Exception e) {
-            log.error("RAG ingestion failed: {} — loading default knowledge", e.getMessage(), e);
-            ingestDefaultKnowledge();
+            ingestionFailure = e.getMessage();
+            log.error("RAG ingestion failed; the application will continue without a loaded knowledge base: {}", e.getMessage(), e);
         }
     }
 
@@ -228,12 +233,20 @@ public class RAGDocumentIngestionService {
                 .map(content -> new Document(content))
                 .toList();
 
-        vectorStore.add(documents);
+        vectorStore().add(documents);
         ingestionComplete = true;
         log.info("Default EV knowledge base loaded: {} documents", documents.size());
     }
 
     public boolean isIngestionComplete() {
         return ingestionComplete;
+    }
+
+    private VectorStore vectorStore() {
+        return vectorStoreProvider.getObject();
+    }
+
+    public String getIngestionFailure() {
+        return ingestionFailure;
     }
 }

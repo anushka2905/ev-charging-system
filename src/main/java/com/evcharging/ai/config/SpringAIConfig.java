@@ -9,7 +9,11 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
 
 /**
  * SpringAIConfig — Phase 1: Spring AI Integration
@@ -43,8 +47,20 @@ public class SpringAIConfig {
      * Production upgrade: replace with PgVectorStore or ChromaVectorStore.
      */
     @Bean
+    @Lazy
     public VectorStore vectorStore(EmbeddingModel embeddingModel) {
         log.info("Initializing SimpleVectorStore for RAG (Phase 5)");
         return SimpleVectorStore.builder(embeddingModel).build();
+    }
+
+    @Bean(name = "ragTaskExecutor")
+    public Executor ragTaskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(1);
+        executor.setMaxPoolSize(1);
+        executor.setQueueCapacity(1);
+        executor.setThreadNamePrefix("rag-ingestion-");
+        executor.initialize();
+        return executor;
     }
 }

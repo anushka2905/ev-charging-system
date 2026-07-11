@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 public class RAGQueryService {
 
     private final ChatClient chatClient;
-    private final VectorStore vectorStore;
+    private final ObjectProvider<VectorStore> vectorStoreProvider;
     private final RAGDocumentIngestionService ingestionService;
 
     @Value("${ev.rag.top-k:5}")
@@ -80,7 +81,7 @@ public class RAGQueryService {
                 .similarityThreshold(similarityThreshold)
                 .build();
 
-        List<Document> docs = vectorStore.similaritySearch(searchRequest);
+        List<Document> docs = vectorStoreProvider.getObject().similaritySearch(searchRequest);
         log.debug("Retrieved {} relevant documents for query: '{}'", docs.size(), question);
         return docs;
     }
